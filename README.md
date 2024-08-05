@@ -1,5 +1,6 @@
 # AndreasDiscordBot
-A Discord bot that talks like a paladin from Curse of Strahd (This is an old D&D character that I created).
+A Discord bot that talks like a paladin from Curse of Strahd (This is an old D&D character that I created)
+(The prompts are in brazilian portuguese btw 🇧🇷)
 
 ## Hosting the Bot
 1. Make sure you have Node.js and Docker installed.
