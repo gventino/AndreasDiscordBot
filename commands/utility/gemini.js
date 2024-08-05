@@ -11,7 +11,9 @@ let data = JSON.parse(fs.readFileSync('./commands/utility/prompt.json'));
 async function run(question, username) {
     let prompt = data.prompt;
     let questions = await getByUsername(username);
-    
+    if(!questions){
+        questions = [];
+    }
     for(const question of questions) {
         const collection = `A pessoa ${question.user} perguntou anteriormente isto:\n
                                 ${question.question}\n

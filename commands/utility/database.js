@@ -32,9 +32,6 @@ async function getByUsername(username){
         }
         else {
             const objects = replies.map(reply => JSON.parse(reply));
-            if (!objects){
-                return [];
-            }
             return objects;
         }
     });
