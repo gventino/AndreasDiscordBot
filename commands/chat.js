@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
 const run  = require('./utility/gemini');
-const fs = require('fs');
+const { store } =  require('./utility/database');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -13,37 +13,23 @@ module.exports = {
                 ),
     async execute(interection) {
         try {
-            let data = JSON.parse(fs.readFileSync('./commands/utility/prompt.json'));
-            const nickname = interection.user.username;
-            const question = interection.options.getString('input');
-            
             await interection.deferReply();
-
-            const answer = await run(question);
+            const username = interection.user.username;
+            const question = interection.options.getString('input');
+            const answer = await run(question, username);
             
-            data.questions.push({
-                user: nickname,
+            const questionObj = {
+                user: username,
                 question: question,
                 answer: answer,
-            });
+            };
+
+            await store(questionObj);
             
-            const jsonString = JSON.stringify(data, null, 2);
-            try {
-                fs.writeFile('./commands/utility/prompt.json', jsonString, (err) => {
-                    if (err) {
-                        console.error('Error saving the json', err);
-                    }
-                });
-            }
-            catch(err){
-                console.error(err);
-            }
-            
-            
-            await interection.editReply(answer);
+            interection.editReply(answer);
         }
         catch(err) {
-            await interection.reply({ content: 'Estou com alguns problemas amigo. Um momento!', ephemeral: true });
+            await interection.editReply({ content: 'Estou com alguns problemas amigo. Um momento!', ephemeral: true });
             console.log(err);
         }
     },

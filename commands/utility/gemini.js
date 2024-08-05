@@ -1,20 +1,25 @@
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const fs = require('fs');
+const { getByUsername } = require('./database');
 require('dotenv').config();
 
-async function run(question) {
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_TOKEN);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash"});
-    let data = JSON.parse(fs.readFileSync('./commands/utility/prompt.json'));
+
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_TOKEN);
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash"});
+let data = JSON.parse(fs.readFileSync('./commands/utility/prompt.json'));
+
+async function run(question, username) {
+    let prompt = data.prompt;
+    let questions = await getByUsername(username);
     
-    for(const item of data.questions) {
-        const collection = `A pessoa ${item.user} perguntou anteriormente isto:\n
-                                ${item.question}\n
+    for(const question of questions) {
+        const collection = `A pessoa ${question.user} perguntou anteriormente isto:\n
+                                ${question.question}\n
                                 Você respondeu o seguinte:\n
-                                ${item.answer}\n`;
-        data.prompt += collection;    
+                                ${question.answer}\n`;
+        prompt += collection;
     }    
-    const prompt = data.prompt + data.final_prompt + question;
+    prompt += data.final_prompt + question;
     
     const result = await model.generateContent(prompt);
     const response = await result.response;
